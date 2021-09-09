@@ -1,0 +1,2 @@
+# visualgorithms
+Qt-based applications
