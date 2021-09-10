@@ -17,5 +17,11 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+public slots:
+    void pressedButton();
+
+private:
+    void createGrid(int);
 };
 #endif // MAINWINDOW_H
