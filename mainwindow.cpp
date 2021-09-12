@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QObject>
 #include <QPushButton>
+#include <QTimer>
 
 #include <iostream>
 #include <list>
@@ -38,6 +39,7 @@ void MainWindow::createGrid(int n)
         for ( int j = 0; j < n; j++ )
         {
             QPushButton* element = new QPushButton(grid);
+            this->grid_elements.push_back(element);
             element->setGeometry(j*30, i*30, 29, 29);
             element->setStyleSheet("QPushButton {"
                                    "background-color: rgba(46, 204, 113, 0.4); border: none;"
@@ -53,16 +55,33 @@ void MainWindow::createGrid(int n)
 void MainWindow::pressedButton()
 {
     QPushButton *button = qobject_cast<QPushButton *> (sender());
-    button->setStyleSheet("QPushButton {"
-                              "background-color: rgba(80, 50, 113, 0.4); border: none;"
-                              "}");
-    std::list <int> blocked;
-    findPath(21, 99, blocked);
+    setRouteDestinations(*button);
 }
 
-std::vector <int> MainWindow::findPath(int start, int end, std::list <int> blocked)
+void MainWindow::setRouteDestinations(QPushButton& cell)
 {
-    std::vector <int> previous(GRID_SIZE^2);
+    int cell_val = (cell.text()).toInt();
+    if ( route.empty() || route.size() == 2 )
+    {
+        this->clearGrid(this->grid_elements);
+        this->route.clear();
+        this->route.push_back(cell_val);
+        cell.setStyleSheet("background-color: rgba(80, 50, 113, 0.4); border: none;");
+    } else if ( route.size() == 1 )
+    {
+        this->route.push_back(cell_val);
+        cell.setStyleSheet("background-color: blue; border: none;");
+
+        std::list <int>::iterator it = this->route.begin();
+        int start = *it;
+        int end = *std::next(it);
+        findPath(start, end);
+    }
+}
+
+std::vector <int> MainWindow::findPath(int start, int end)
+{
+    std::vector <int> previous(GRID_SIZE*GRID_SIZE);
     std::list <int> queue;
     std::list <int> visited;
     queue.push_back(start);
@@ -85,18 +104,37 @@ std::vector <int> MainWindow::findPath(int start, int end, std::list <int> block
             if ( neighbor == end ) { foundEnd = true; break; }
         }
     }
-    printShortestPath(previous);
+    drawShortestPath(previous, end, start);
     return previous;
 }
 
-void MainWindow::printShortestPath(std::vector <int> prev)
+void MainWindow::drawShortestPath(std::vector <int> prev, int end, int start)
 {
-    int cell = prev.back();
-    while ( cell != 0 )
+    int cell = end;
+    while ( cell != start )
     {
-        qDebug() << cell;
+        this->grid_elements[cell]->setStyleSheet("background-color: red; border: none;");
         cell = prev[cell];
     }
+}
+
+void MainWindow::clearGrid (std::vector<QPushButton*> cells)
+{
+    for (auto cell : cells)
+    {
+        this->delay(8);
+        cell->setStyleSheet("background-color: rgba(46, 204, 113, 0.4); border: none;");
+    }
+}
+
+void MainWindow::delay(int msec)
+{
+    QEventLoop loop;
+    QTimer timer;
+    timer.connect(&timer, &QTimer::timeout,
+                  &loop, &QEventLoop::quit);
+    timer.start(msec);
+    loop.exec();
 }
 
 std::list <int> MainWindow::neighbors(int cell, int const GRID_SIZE)

@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <iostream>
 #include <list>
+#include <QPushButton>
+#include <QObject>
 #include <vector>
 
 QT_BEGIN_NAMESPACE
@@ -27,9 +29,15 @@ public slots:
 public:
     int const GRID_SIZE;
     void createGrid(int GRID_SIZE);
-    std::vector <int> findPath(int start, int end, std::list <int>);
+    std::vector <QPushButton*> grid_elements;
+    std::list <int> blockedCells;
+    std::list <int> route;
+    void setRouteDestinations(QPushButton&);
+    std::vector <int> findPath(int start, int end);
     std::list <int> neighbors(int cell, int GRID_SIZE);
-    void printShortestPath(std::vector <int> previous_list);
+    void drawShortestPath(std::vector <int> previous_list, int end, int start);
+    void clearGrid(std::vector<QPushButton*> grid_elements);
+    void delay(int msec);
 };
 
 
