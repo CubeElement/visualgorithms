@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QTimer>
 #include <QMouseEvent>
+#include <QStringList>
 
 #include <iostream>
 #include <list>
@@ -16,7 +17,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow), GRID_SIZE(10)
+    , ui(new Ui::MainWindow), GRID_SIZE(15)
 {
     ui->setupUi(this);
     this->createGrid(GRID_SIZE);
@@ -42,50 +43,74 @@ void MainWindow::createGrid(int n)
             QPushButton* element = new QPushButton(grid);
             this->grid_elements.push_back(element);
             element->setGeometry(j*30, i*30, 29, 29);
-            element->setStyleSheet("QPushButton {"
-                                   "background-color: rgba(46, 204, 113, 0.4); border: none;"
-                                   "}");
+            this->setCellColor(element, "bg");
             element->setText(QString::number(counter));
             counter++;
             QObject::connect(element, &QPushButton::pressed,
-                             this, &MainWindow::pressedButton);
+                             this, &MainWindow::leftMouseButton);
             element->installEventFilter(this);
-            QObject::connect(this, &MainWindow::rightClick,
-                             this, &MainWindow::setObstacles);
         }
     }
 }
 
-void MainWindow::pressedButton()
+void MainWindow::setCellColor(QPushButton *cell, QString type)
 {
-    QPushButton *button = qobject_cast<QPushButton *> (sender());
-    setRouteDestinations(*button);
+    QStringList types;
+    types << "bg" << "start" << "end" << "blocked" << "path";
+    switch( types.indexOf(type) )
+    {
+    case 0:
+        cell->setStyleSheet("background-color: rgba(201, 195, 167, 0.9); "
+                            "border: none;");
+        break;
+    case 1:
+        cell->setStyleSheet("background-color: rgba(67, 168, 73, 0.9); "
+                            "border: none;");
+        break;
+    case 2:
+        cell->setStyleSheet("background-color: rgba(67, 168, 73, 0.9); "
+                            "border: none;");
+        break;
+    case 3:
+        cell->setStyleSheet("background-color: rgba(120, 83, 31, 0.9); "
+                            "border: none;");
+        break;
+    case 4:
+        cell->setStyleSheet("background-color: rgba(174, 103, 245, 0.9); "
+                            "border: none;");
+        break;
+    }
 }
 
-void MainWindow::setObstacles()
+void MainWindow::leftMouseButton()
 {
-    this->blockedCells.push_back(15);
+    QPushButton* button = qobject_cast<QPushButton*> (sender());
+    setRouteDestinations(button);
 }
 
-void MainWindow::setRouteDestinations(QPushButton& cell)
+void MainWindow::setObstacles(QPushButton* cell)
 {
-    int cell_val = (cell.text()).toInt();
+    this->setCellColor(cell, "blocked");
+    this->blockedCells.push_back(cell->text().toInt());
+}
+
+void MainWindow::setRouteDestinations(QPushButton* cell)
+{
+    int cell_val = (cell->text()).toInt();
     if ( route.empty() )
     {
         this->route.push_back(cell_val);
-        cell.setStyleSheet("background-color: rgba(80, 50, 113, 0.4); border: none;");
+        this->setCellColor(cell, "start");
     } else if ( route.size() == 1 )
     {
         this->route.push_back(cell_val);
-        cell.setStyleSheet("background-color: blue; border: none;");
-
+        this->setCellColor(cell, "end");
         std::list <int>::iterator it = this->route.begin();
         int start = *it;
         int end = *std::next(it);
         findPath(start, end);
     } else if ( route.size() == 2 )
     {
-        this->route.clear();
         this->clearGrid(this->grid_elements);
     }
 }
@@ -124,17 +149,19 @@ void MainWindow::drawShortestPath(std::vector <int> prev, int end, int start)
     int cell = end;
     while ( cell != start )
     {
-        this->grid_elements[cell]->setStyleSheet("background-color: red; border: none;");
+        this->setCellColor(this->grid_elements[cell], "path");
         cell = prev[cell];
     }
 }
 
 void MainWindow::clearGrid (std::vector<QPushButton*> cells)
 {
+    this->route.clear();
+    this->blockedCells.clear();
     for (auto cell : cells)
     {
 //        this->delay(8);
-        cell->setStyleSheet("background-color: rgba(46, 204, 113, 0.4); border: none;");
+        this->setCellColor(cell, "bg");
     }
 }
 
@@ -165,13 +192,13 @@ std::list <int> MainWindow::neighborsList(int cell, int const GRID_SIZE)
 
 bool MainWindow::eventFilter(QObject* obj, QEvent *event)
 {
+    QPushButton* cell = qobject_cast<QPushButton*>(obj);
     if ( event->type() == QEvent::MouseButtonPress)
     {
         QMouseEvent* keyEvent = static_cast<QMouseEvent*>(event);
         if ( keyEvent->button() == Qt::RightButton )
         {
-            qDebug() << "right button clicked";
-            emit rightClick();
+            this->setObstacles(cell);
             return true;
         } else
         {

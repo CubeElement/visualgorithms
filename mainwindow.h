@@ -23,12 +23,9 @@ public:
 private:
     Ui::MainWindow *ui;
 
-signals:
-    void rightClick();
-
 public slots:
-    void pressedButton();
-    void setObstacles();
+    void leftMouseButton();
+    void setObstacles(QPushButton*);
 
 protected:
     bool eventFilter(QObject*, QEvent*) override;
@@ -39,12 +36,13 @@ public:
     std::vector <QPushButton*> grid_elements;
     std::list <int> blockedCells;
     std::list <int> route;
-    void setRouteDestinations(QPushButton&);
+    void setRouteDestinations(QPushButton* cell);
     std::vector <int> findPath(int start, int end);
     std::list <int> neighborsList(int cell, int GRID_SIZE);
     void drawShortestPath(std::vector <int> previous_list, int end, int start);
     void clearGrid(std::vector<QPushButton*> grid_elements);
     void delay(int msec);
+    void setCellColor(QPushButton* cell, QString type);
 };
 
 #endif // MAINWINDOW_H
