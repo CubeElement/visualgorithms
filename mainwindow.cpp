@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QPushButton>
 #include <QTimer>
+#include <QMouseEvent>
 
 #include <iostream>
 #include <list>
@@ -48,6 +49,9 @@ void MainWindow::createGrid(int n)
             counter++;
             QObject::connect(element, &QPushButton::pressed,
                              this, &MainWindow::pressedButton);
+            element->installEventFilter(this);
+            QObject::connect(this, &MainWindow::rightClick,
+                             this, &MainWindow::setObstacles);
         }
     }
 }
@@ -58,13 +62,16 @@ void MainWindow::pressedButton()
     setRouteDestinations(*button);
 }
 
+void MainWindow::setObstacles()
+{
+    this->blockedCells.push_back(15);
+}
+
 void MainWindow::setRouteDestinations(QPushButton& cell)
 {
     int cell_val = (cell.text()).toInt();
-    if ( route.empty() || route.size() == 2 )
+    if ( route.empty() )
     {
-        this->clearGrid(this->grid_elements);
-        this->route.clear();
         this->route.push_back(cell_val);
         cell.setStyleSheet("background-color: rgba(80, 50, 113, 0.4); border: none;");
     } else if ( route.size() == 1 )
@@ -76,6 +83,10 @@ void MainWindow::setRouteDestinations(QPushButton& cell)
         int start = *it;
         int end = *std::next(it);
         findPath(start, end);
+    } else if ( route.size() == 2 )
+    {
+        this->route.clear();
+        this->clearGrid(this->grid_elements);
     }
 }
 
@@ -83,7 +94,7 @@ std::vector <int> MainWindow::findPath(int start, int end)
 {
     std::vector <int> previous(GRID_SIZE*GRID_SIZE);
     std::list <int> queue;
-    std::list <int> visited;
+    std::list <int> visited = this->blockedCells;
     queue.push_back(start);
     visited.push_back(start);
 
@@ -93,7 +104,7 @@ std::vector <int> MainWindow::findPath(int start, int end)
     {
         current = queue.front();
         queue.pop_front();
-        for ( int neighbor : neighbors(current, GRID_SIZE) )
+        for ( int neighbor : neighborsList(current, GRID_SIZE) )
         {
             if ( std::count(visited.begin(), visited.end(), neighbor) == 0)
             {
@@ -122,7 +133,7 @@ void MainWindow::clearGrid (std::vector<QPushButton*> cells)
 {
     for (auto cell : cells)
     {
-        this->delay(8);
+//        this->delay(8);
         cell->setStyleSheet("background-color: rgba(46, 204, 113, 0.4); border: none;");
     }
 }
@@ -137,7 +148,7 @@ void MainWindow::delay(int msec)
     loop.exec();
 }
 
-std::list <int> MainWindow::neighbors(int cell, int const GRID_SIZE)
+std::list <int> MainWindow::neighborsList(int cell, int const GRID_SIZE)
 {
     std::list <int> adjacent_cells;
 
@@ -150,4 +161,22 @@ std::list <int> MainWindow::neighbors(int cell, int const GRID_SIZE)
     if ( coor_x - 1 >= 0 ) adjacent_cells.push_back( cell - 1 );
 
     return adjacent_cells;
+}
+
+bool MainWindow::eventFilter(QObject* obj, QEvent *event)
+{
+    if ( event->type() == QEvent::MouseButtonPress)
+    {
+        QMouseEvent* keyEvent = static_cast<QMouseEvent*>(event);
+        if ( keyEvent->button() == Qt::RightButton )
+        {
+            qDebug() << "right button clicked";
+            emit rightClick();
+            return true;
+        } else
+        {
+            return QObject::eventFilter(obj, event);
+        }
+    }
+    return false;
 }
