@@ -25,19 +25,27 @@ private:
 
 public slots:
     void leftMouseButton();
-    void setObstacles(QPushButton*);
+    void rightMouseButton(QPushButton*);
+    void killLoop() { killLoopFlag = true; }
+
+private:
+    bool killLoopFlag;
+
+signals:
+    void stopAnimation();
 
 protected:
     bool eventFilter(QObject*, QEvent*) override;
 
 public:
     int const GRID_SIZE;
+    int const DELAY_MS;
     void createGrid(int GRID_SIZE);
     std::vector <QPushButton*> grid_elements;
     std::list <int> blockedCells;
     std::list <int> route;
     void setRouteDestinations(QPushButton* cell);
-    std::vector <int> findPath(int start, int end);
+    std::vector <int> findPathBFS(int start, int end);
     std::list <int> neighborsList(int cell, int GRID_SIZE);
     void drawShortestPath(std::vector <int> previous_list, int end, int start);
     void clearGrid(std::vector<QPushButton*> grid_elements);

@@ -17,10 +17,12 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow), GRID_SIZE(15)
+    , ui(new Ui::MainWindow), GRID_SIZE(15), DELAY_MS(8)
 {
     ui->setupUi(this);
     this->createGrid(GRID_SIZE);
+    QObject::connect( this, &MainWindow::stopAnimation,
+                      this, &MainWindow::killLoop);
 }
 
 MainWindow::~MainWindow()
@@ -53,43 +55,15 @@ void MainWindow::createGrid(int n)
     }
 }
 
-void MainWindow::setCellColor(QPushButton *cell, QString type)
-{
-    QStringList types;
-    types << "bg" << "start" << "end" << "blocked" << "path";
-    switch( types.indexOf(type) )
-    {
-    case 0:
-        cell->setStyleSheet("background-color: rgba(201, 195, 167, 0.9); "
-                            "border: none;");
-        break;
-    case 1:
-        cell->setStyleSheet("background-color: rgba(67, 168, 73, 0.9); "
-                            "border: none;");
-        break;
-    case 2:
-        cell->setStyleSheet("background-color: rgba(67, 168, 73, 0.9); "
-                            "border: none;");
-        break;
-    case 3:
-        cell->setStyleSheet("background-color: rgba(120, 83, 31, 0.9); "
-                            "border: none;");
-        break;
-    case 4:
-        cell->setStyleSheet("background-color: rgba(174, 103, 245, 0.9); "
-                            "border: none;");
-        break;
-    }
-}
-
 void MainWindow::leftMouseButton()
 {
     QPushButton* button = qobject_cast<QPushButton*> (sender());
     setRouteDestinations(button);
 }
 
-void MainWindow::setObstacles(QPushButton* cell)
+void MainWindow::rightMouseButton(QPushButton* cell)
 {
+    if ( !killLoopFlag ) { emit stopAnimation(); clearGrid(grid_elements); }
     this->setCellColor(cell, "blocked");
     this->blockedCells.push_back(cell->text().toInt());
 }
@@ -105,17 +79,19 @@ void MainWindow::setRouteDestinations(QPushButton* cell)
     {
         this->route.push_back(cell_val);
         this->setCellColor(cell, "end");
+
         std::list <int>::iterator it = this->route.begin();
         int start = *it;
         int end = *std::next(it);
-        findPath(start, end);
+        findPathBFS(start, end);
     } else if ( route.size() == 2 )
     {
+        emit stopAnimation();
         this->clearGrid(this->grid_elements);
     }
 }
 
-std::vector <int> MainWindow::findPath(int start, int end)
+std::vector <int> MainWindow::findPathBFS(int start, int end)
 {
     std::vector <int> previous(GRID_SIZE*GRID_SIZE);
     std::list <int> queue;
@@ -125,16 +101,26 @@ std::vector <int> MainWindow::findPath(int start, int end)
 
     int current = start;
     bool foundEnd = false;
-    while ( !queue.empty() && !foundEnd)
+
+    killLoopFlag = false;
+
+    while ( !queue.empty() && !foundEnd && !killLoopFlag )
     {
         current = queue.front();
+        this->setCellColor(this->grid_elements[current], "current");
+        delay(DELAY_MS);
+
         queue.pop_front();
         for ( int neighbor : neighborsList(current, GRID_SIZE) )
         {
+            if ( killLoopFlag == true ) { qDebug() << "stop"; break;}
+            QApplication::processEvents();
             if ( std::count(visited.begin(), visited.end(), neighbor) == 0)
             {
                 queue.push_back(neighbor);
                 visited.push_back(neighbor);
+                this->setCellColor(this->grid_elements[neighbor], "searched");
+                delay(DELAY_MS);
                 previous[neighbor] = current;
             }
             if ( neighbor == end ) { foundEnd = true; break; }
@@ -146,11 +132,24 @@ std::vector <int> MainWindow::findPath(int start, int end)
 
 void MainWindow::drawShortestPath(std::vector <int> prev, int end, int start)
 {
-    int cell = end;
-    while ( cell != start )
+    if ( prev[end] != 0 )
     {
-        this->setCellColor(this->grid_elements[cell], "path");
-        cell = prev[cell];
+        int cell = end;
+        std::list<int> reversed;
+        reversed.push_front(cell);
+        while ( cell != start )
+        {
+            cell = prev[cell];
+            reversed.push_front(cell);
+        }
+        for ( int cell : reversed )
+        {
+            delay(DELAY_MS);
+            this->setCellColor(this->grid_elements[cell], "path");
+        }
+    } else
+    {
+        qDebug() << "error message";
     }
 }
 
@@ -160,7 +159,6 @@ void MainWindow::clearGrid (std::vector<QPushButton*> cells)
     this->blockedCells.clear();
     for (auto cell : cells)
     {
-//        this->delay(8);
         this->setCellColor(cell, "bg");
     }
 }
@@ -198,7 +196,7 @@ bool MainWindow::eventFilter(QObject* obj, QEvent *event)
         QMouseEvent* keyEvent = static_cast<QMouseEvent*>(event);
         if ( keyEvent->button() == Qt::RightButton )
         {
-            this->setObstacles(cell);
+            this->rightMouseButton(cell);
             return true;
         } else
         {
@@ -207,3 +205,42 @@ bool MainWindow::eventFilter(QObject* obj, QEvent *event)
     }
     return false;
 }
+
+void MainWindow::setCellColor(QPushButton *cell, QString type)
+{
+    QStringList types;
+    types << "bg" << "start" << "end" << "blocked" << "path" << "searched"
+          << "current";
+    switch( types.indexOf(type) )
+    {
+    case 0:  // bg
+        cell->setStyleSheet("background-color: rgba(201, 195, 167, 0.9); "
+                            "border: none;");
+        break;
+    case 1:  // start
+        cell->setStyleSheet("background-color: rgba(67, 168, 73, 0.9); "
+                            "border: none;");
+        break;
+    case 2:  // end
+        cell->setStyleSheet("background-color: rgba(67, 168, 73, 0.9); "
+                            "border: none;");
+        break;
+    case 3:  // blocked
+        cell->setStyleSheet("background-color: rgba(120, 83, 31, 0.9); "
+                            "border: none;");
+        break;
+    case 4:  // path
+        cell->setStyleSheet("background-color: rgba(240, 65, 43, 0.9); "
+                            "border: none;");
+        break;
+    case 5:  // searched
+        cell->setStyleSheet("background-color: rgba(240, 224, 40, 0.9); "
+                            "border: none;");
+        break;
+    case 6:  // current
+        cell->setStyleSheet("background-color: rgba(79, 49, 163, 0.9); "
+                            "border: none;");
+        break;
+    }
+}
+
