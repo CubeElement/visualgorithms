@@ -23,6 +23,9 @@ MainWindow::MainWindow(QWidget *parent)
     this->createGrid(GRID_SIZE);
     QObject::connect( this, &MainWindow::stopAnimation,
                       this, &MainWindow::killLoop);
+    QLabel* tip = new QLabel("Left Mouse: set route / clear grid, Right Mouse: set obstacle", this);
+    tip->setAlignment(Qt::AlignCenter);
+    ui->statusBar->insertPermanentWidget(0, tip, 1);
 }
 
 MainWindow::~MainWindow()
@@ -35,7 +38,7 @@ void MainWindow::createGrid(int n)
     QWidget* grid = new QWidget();
     ui->mainlayout->addWidget(grid);
 
-    this->resize( 30*n+20, 30*n+20);
+    this->resize( 30*n+20, 30*n+45);
 
     int counter = 0;
     for ( int i = 0; i < n; i++ )
@@ -226,7 +229,7 @@ void MainWindow::setCellColor(QPushButton *cell, QString type)
                             "border: none;");
         break;
     case 3:  // blocked
-        cell->setStyleSheet("background-color: rgba(120, 83, 31, 0.9); "
+        cell->setStyleSheet("background-color: rgba(102, 0, 34, 0.9); "
                             "border: none;");
         break;
     case 4:  // path
