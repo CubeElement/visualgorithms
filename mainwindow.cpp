@@ -217,7 +217,7 @@ void MainWindow::setCellColor(QPushButton *cell, QString type)
     switch( types.indexOf(type) )
     {
     case 0:  // bg
-        cell->setStyleSheet("background-color: rgba(201, 195, 167, 0.9); "
+        cell->setStyleSheet("background-color: rgba(201, 195, 167, 0.4); "
                             "border: none;");
         break;
     case 1:  // start
@@ -229,7 +229,7 @@ void MainWindow::setCellColor(QPushButton *cell, QString type)
                             "border: none;");
         break;
     case 3:  // blocked
-        cell->setStyleSheet("background-color: rgba(102, 0, 34, 0.9); "
+        cell->setStyleSheet("background-color: rgba(75, 75, 75, 0.9); "
                             "border: none;");
         break;
     case 4:  // path
@@ -237,11 +237,11 @@ void MainWindow::setCellColor(QPushButton *cell, QString type)
                             "border: none;");
         break;
     case 5:  // searched
-        cell->setStyleSheet("background-color: rgba(240, 224, 40, 0.9); "
+        cell->setStyleSheet("background-color: rgba(255, 176, 221, 0.9); "
                             "border: none;");
         break;
     case 6:  // current
-        cell->setStyleSheet("background-color: rgba(79, 49, 163, 0.9); "
+        cell->setStyleSheet("background-color: rgba(186, 176, 225, 0.9); "
                             "border: none;");
         break;
     }
