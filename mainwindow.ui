@@ -6,27 +6,39 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>400</height>
+    <width>800</width>
+    <height>380</height>
    </rect>
   </property>
-  <property name="maximumSize">
-   <size>
-    <width>900</width>
-    <height>900</height>
-   </size>
-  </property>
   <property name="windowTitle">
-   <string>Shortest Path Search</string>
+   <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <layout class="QVBoxLayout" name="mainlayout"/>
-    </item>
-   </layout>
+   <widget class="QPushButton" name="pushButton">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>211</width>
+      <height>27</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>GridPath Algorithms</string>
+    </property>
+   </widget>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>24</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

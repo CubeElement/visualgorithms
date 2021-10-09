@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "gridpath.h"
+
 #include <QMainWindow>
 #include <iostream>
 #include <list>
@@ -20,37 +22,14 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
 
-public slots:
-    void leftMouseButton();
-    void rightMouseButton(QPushButton*);
-    void killLoop() { killLoopFlag = true; }
-
 private:
-    bool killLoopFlag;
-
-signals:
-    void stopAnimation();
-
-protected:
-    bool eventFilter(QObject*, QEvent*) override;
-
-public:
-    int const GRID_SIZE;
-    int const DELAY_MS;
-    void createGrid(int GRID_SIZE);
-    std::vector <QPushButton*> grid_elements;
-    std::list <int> blockedCells;
-    std::list <int> route;
-    void setRouteDestinations(QPushButton* cell);
-    std::vector <int> findPathBFS(int start, int end);
-    std::list <int> neighborsList(int cell, int GRID_SIZE);
-    void drawShortestPath(std::vector <int> previous_list, int end, int start);
-    void clearGrid(std::vector<QPushButton*> grid_elements);
-    void delay(int msec);
-    void setCellColor(QPushButton* cell, QString type);
+    Gridpath* mGridpathModule = nullptr;
 };
 
 #endif // MAINWINDOW_H

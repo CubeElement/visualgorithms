@@ -32,6 +32,9 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        gridpath.cpp
+        gridpath.h
+        gridpath.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
