@@ -29,12 +29,12 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
 set(PROJECT_SOURCES
         main.cpp
-        mainwindow.cpp
-        mainwindow.h
-        mainwindow.ui
-        gridpath.cpp
-        gridpath.h
-        gridpath.ui
+        src/mainwindow.cpp
+        src/mainwindow.h
+        src/mainwindow.ui
+        src/gridpath.cpp
+        src/gridpath.h
+        src/gridpath.ui
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
