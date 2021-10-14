@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "grid.h"
+#include "breadthfs.h"
 #include <QGridLayout>
 #include <QLabel>
 #include <QSizePolicy>
@@ -21,7 +21,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    mGridpathModule = new Grid(this);
 }
 
 MainWindow::~MainWindow()
@@ -30,7 +29,9 @@ MainWindow::~MainWindow()
 }
 
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_breadthfs_button_clicked()
 {
+    mGridpathModule = new BreadthFS(this);
+    mGridpathModule->setAttribute(Qt::WA_DeleteOnClose, true);
     mGridpathModule->show();
 }

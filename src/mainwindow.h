@@ -1,8 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
-#include "grid.h"
-
+#include "breadthfs.h"
 #include <QMainWindow>
 #include <iostream>
 #include <list>
@@ -23,13 +21,13 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_breadthfs_button_clicked();
 
 private:
     Ui::MainWindow *ui;
 
 private:
-    Grid* mGridpathModule = nullptr;
+    BreadthFS* mGridpathModule = nullptr;
 };
 
 #endif // MAINWINDOW_H

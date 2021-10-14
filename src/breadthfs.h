@@ -1,16 +1,19 @@
 #ifndef BREADTHFS_H
 #define BREADTHFS_H
 
-#include <QObject>
+#include "grid.h"
 
-class BreadthFS : public QObject
+#include <vector>
+
+class BreadthFS : public Grid
 {
     Q_OBJECT
+
 public:
-    explicit BreadthFS(QObject *parent = nullptr);
+    explicit BreadthFS(QWidget *parent = nullptr);
 
-signals:
-
+protected:
+    virtual std::vector<int> shortestPath(int start, int end) override;
 };
 
 #endif // BREADTHFS_H

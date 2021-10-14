@@ -14,18 +14,31 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>30</y>
-      <width>211</width>
-      <height>27</height>
+      <width>161</width>
+      <height>64</height>
      </rect>
     </property>
-    <property name="text">
-     <string>GridPath Algorithms</string>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QPushButton" name="breadthfs_button">
+       <property name="text">
+        <string>Breadth-First Search</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="breadthfs_button_2">
+       <property name="text">
+        <string>Depth-First Search</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -34,7 +47,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>24</height>
+     <height>25</height>
     </rect>
    </property>
   </widget>
