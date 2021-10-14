@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include "gridpath.h"
+#include "grid.h"
 #include <QGridLayout>
 #include <QLabel>
 #include <QSizePolicy>
@@ -21,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    mGridpathModule = new Gridpath(this);
+    mGridpathModule = new Grid(this);
 }
 
 MainWindow::~MainWindow()

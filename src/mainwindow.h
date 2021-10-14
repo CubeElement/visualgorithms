@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "gridpath.h"
+#include "grid.h"
 
 #include <QMainWindow>
 #include <iostream>
@@ -29,7 +29,7 @@ private:
     Ui::MainWindow *ui;
 
 private:
-    Gridpath* mGridpathModule = nullptr;
+    Grid* mGridpathModule = nullptr;
 };
 
 #endif // MAINWINDOW_H
