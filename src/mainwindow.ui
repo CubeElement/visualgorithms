@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -27,14 +27,14 @@
      <item>
       <widget class="QPushButton" name="breadthfs_button">
        <property name="text">
-        <string>Breadth-First Search</string>
+        <string>Breadth First Search</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="breadthfs_button_2">
+      <widget class="QPushButton" name="depthfs_button">
        <property name="text">
-        <string>Depth-First Search</string>
+        <string>Depth First Search</string>
        </property>
       </widget>
      </item>

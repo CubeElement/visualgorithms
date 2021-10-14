@@ -24,6 +24,7 @@ set(PROJECT_SOURCES
         src/grid.ui
         src/breadthfs.h
         src/breadthfs.cpp
+        src/depthfs.h src/depthfs.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
